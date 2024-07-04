@@ -12,7 +12,8 @@ import { Height } from "metashrew-as/assembly/blockdata/height";
 import { Sat, SatPoint } from "metashrew-as/assembly/blockdata/sat";
 import { JUBILEE_HEIGHT } from "./constants";
 import { BST } from "metashrew-as/assembly/indexer/bst";
-import { processInscriptionForBRC20 } from "./brc20";
+import { Index as SpendablesIndex } from "metashrew-spendables/assembly/indexer";
+import { processInscriptionForBRC20, processInscriptionTransferForBRC20 } from "./brc20";
 
 import { ordinals } from "./protobuf";
 
@@ -291,6 +292,7 @@ class Index {
 	  SATPOINT_TO_INSCRIPTION_ID.select(satpoint).set(inscriptionId);
 	  INSCRIPTION_ID_TO_SATPOINT.select(inscriptionId).set(satpoint);
 	  OUTPOINT_TO_SEQUENCE_NUMBERS.select(outpoint).appendValue<u64>(inscriptionsForOutpoint[j]);
+	  processInscriptionTransferForBRC20(inscriptionsForOutpoint[j], previousOutput, outpoint);
 	}
       }
     }
@@ -371,6 +373,7 @@ export function _start(): void {
   const box = Box.from(data);
   const height = parsePrimitive<u32>(box);
   const block = new Block(box);
+  SpendablesIndex.indexBlock(height, block);
   Index.indexBlock(height, block);
   _flush();
 }

@@ -1,9 +1,11 @@
 import { Script } from "metashrew-as/assembly/utils/yabsp";
 import { Address } from "metashrew-as/assembly/blockdata/address";
 import { Box } from "metashrew-as/assembly/utils/box";
+import { Output } from "metashrew-as/assembly/blockdata/transaction";
 import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
 import { JSON } from "json-as/assembly";
 import { u128 } from "as-bignum/assembly";
+import { OUTPOINT_TO_OUTPUT } from "metashrew-spendables/assembly/tables";
 
 function min<T>(a: T, b: T): T {
   if (a > b) return b;
@@ -62,8 +64,9 @@ export function processInscriptionForBRC20(sequenceNumber: u64, script: Box, bod
 	pointer.keyword("/max").set(u128ToArrayBuffer(deployMessage.max));
 	pointer.keyword("/dec").set(u128ToArrayBuffer(defaultDecimals(deployMessage.dec)));
 	pointer.keyword("/lim").set(u128ToArrayBuffer(defaultToMax(deployMessage.lim)));
+	BRC20_INDEX.keyword("/tickers").append(String.UTF8.encode(parsed.tick));
       }
-    } else if (parsed.isTransfer()) {
+    } else if (parsed.isTransfer() && deployment.getValue<u64>() !== 0) {
       if (receiverAddress !== null) {
 	const transferMessage = parsed.toTransfer();
         const unspentPointer = pointer.keyword("/unspent/").select(receiverAddress as ArrayBuffer);
@@ -93,6 +96,44 @@ export function processInscriptionForBRC20(sequenceNumber: u64, script: Box, bod
 	    tPointer.keyword("/holders").append(receiverAddress as ArrayBuffer);
 	  }
         }
+      }
+    }
+  }
+}
+
+function outpointToAddress(outpoint: ArrayBuffer): ArrayBuffer | null {
+  return Address.from(new Script(new Output(Box.from(OUTPOINT_TO_OUTPUT.select(outpoint).get())).script));
+}
+
+export function processInscriptionTransferForBRC20(sequenceNumber: u64, fromOutPoint: ArrayBuffer, toOutPoint: ArrayBuffer): void {
+  const unspentToSequenceNumberPointer = BRC20_INDEX.keyword("/unspent/").selectValue<u64>(sequenceNumber);
+  const unspent = unspentToSequenceNumberPointer.get();
+  if (unspent.byteLength !== 0) {
+    const parsed = JSON.parse<ProtocolMessage>(String.UTF8.decode(unspent));
+    if (parsed.isBRC20() && parsed.isTransfer()) {
+      const transferMessage = parsed.toTransfer();
+      const pointer = BRC20_INDEX.keyword(transferMessage.tick);
+      const from = outpointToAddress(fromOutPoint);
+      const to = outpointToAddress(toOutPoint);
+      const unspentPointer = pointer.keyword("/unspent/").select(from as ArrayBuffer);
+      const unspent = u128FromArrayBuffer(unspentPointer.get());
+      unspentToSequenceNumberPointer.set(new ArrayBuffer(0));
+      unspentPointer.set(u128ToArrayBuffer(u128FromArrayBuffer(unspentPointer.get()) - transferMessage.amt));
+      if (to !== null && (from as ArrayBuffer).byteLength === (to as ArrayBuffer).byteLength && memory.compare(changetype<usize>(from), changetype<usize>(to), (from as ArrayBuffer).byteLength) === 0) {
+        unspentPointer.set(u128ToArrayBuffer(unspent - transferMessage.amt));
+      } else {
+        const balancePointer = pointer.keyword("/balances");
+        const fromBalancePointer = balancePointer.select(from as ArrayBuffer);
+        fromBalancePointer.set(u128ToArrayBuffer(u128FromArrayBuffer(fromBalancePointer.get()) - transferMessage.amt));
+        if (to !== null) {
+          const toBalancePointer = balancePointer.select(to as ArrayBuffer);
+	  toBalancePointer.set(u128ToArrayBuffer(u128FromArrayBuffer(toBalancePointer.get()) + transferMessage.amt));
+	  const tPointer = pointer.keyword("/seen/").select(to as ArrayBuffer);
+	  if (tPointer.getValue<u32>() === 0) {
+	    tPointer.setValue<u32>(1);
+	    tPointer.keyword("/holders").append(to as ArrayBuffer);
+	  }
+	}
       }
     }
   }
