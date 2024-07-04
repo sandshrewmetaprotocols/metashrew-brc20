@@ -1,5 +1,31 @@
+import { Script } from "metashrew-as/assembly/utils/yabsp";
+import { Box } from "metashrew-as/assembly/utils/box";
+import { IndexPointer } from "metashrew-as/assembly/indexer/tables";
 import { JSON } from "json-as/assembly";
 import { u128 } from "as-bignum/assembly";
+
+function min<T>(a: T, b: T): T {
+  if (a > b) return b;
+  return a;
+}
+
+function max<T>(a: T, b: T): T {
+  if (a < b) return b;
+  return a;
+}
+
+export const BRC20_INDEX = IndexPointer.for("/brc20/");
+
+export function u128ToArrayBuffer(data: u128): ArrayBuffer {
+  const bytes = data.toBytes();
+  return changetype<Uint8Array>(bytes).buffer;
+}
+
+export function u128FromArrayBuffer(data: ArrayBuffer): u128 {
+  if (data.byteLength === 0) return u128.from(0);
+  const result = u128.fromBytes(changetype<u8[]>(Uint8Array.wrap(data)));
+  return result;
+}
 
 export function wouldOverflowU128(decimal: string): boolean {
   const maxDecimal = u128.Max.toString(10);
@@ -10,6 +36,51 @@ export function wouldOverflowU128(decimal: string): boolean {
     if (parseInt(decimal[i], 10) > parseInt(maxDecimal[i], 10)) return true;
   }
   return false;
+}
+
+export function processInscriptionForBRC20(sequenceNumber: u64, script: ArrayBuffer, body: ArrayBuffer): void {
+  const parsed = JSON.parse<ProtocolMessage>(String.UTF8.decode(body));
+  const receiverAddress = new Script(Box.from(script)).intoAddress();
+  if (parsed.isBRC20()) {
+    const pointer = BRC20_INDEX.keyword(parsed.tick);
+    const deployment = pointer.keyword("/sequence");
+    if (parsed.isDeploy()) {
+      const deployMessage = parsed.toDeploy();
+      if (deployment.get().byteLength !== 0) {
+	deployment.setValue<u64>(sequenceNumber)
+	pointer.keyword("/max").set(u128ToArrayBuffer(deployMessage.max));
+	pointer.keyword("/dec").set(u128ToArrayBuffer(deployMessage.dec === null ? u128.from(18) : deployMessage.dec));
+	pointer.keyword("/lim").set(u128ToArrayBuffer(deployMessage.lim === null ? u128.Max : deployMessage.lim));
+      }
+    } else if (parsed.isTransfer()) {
+      const transferMessage = parsed.toTransfer();
+      const unspentPointer = pointer.select("/unspent/").keyword(receiverAddress);
+      const unspent = u128FromArrayBuffer(unspentPointer.get());
+      const available = u128FromArrayBuffer(pointer.keyword("/balances/").keyword(receiverAddress).get()) - unspent;
+      if (available >= transferMessage.amt) {
+        BRC20_INDEX.select("/unspent/").selectValue<u64>(sequenceNumber).set(body);
+	unspentPointer.set(u128ToArrayBuffer(unspent + transferMessage.amt));
+      }
+    } else if (parsed.isMint()) {
+      const mintMessage = parsed.toMint();
+      const deployed = deployment.getValue<u64>();
+      if (deployed !== 0) {
+        const totalPointer = pointer.keyword("/total");
+	const totalSupply = u128FromArrayBuffer(totalPointer.get());
+        const mintable = u128FromArrayBuffer(pointer.keyword("/max").get()) - totalSupply;
+	const restricted = min(u128FromArrayBuffer(pointer.keyword("/lim")), mintMessage.amt);
+	const change = min(mintable, restricted);
+	const balance = pointer.keyword("/balances/").keyword(receiverAddress);
+	balance.set(u128ToArrayBuffer(u128FromArrayBuffer(balance.get()) + change));
+	totalPointer.set(u128ToArrayBuffer(totalSupply + change));
+	const tPointer = pointer.keyword("/seen/").keyword(receiverAddress);
+	if (tPointer.getValue<u32>() === 0) {
+          tPointer.setValue<u32>(1);
+          tPointer.keyword("/holders").append(String.UTF8.encode(receiverAddress));
+        }
+      }
+    }
+  }
 }
 
 export class ProtocolMintMessage {
