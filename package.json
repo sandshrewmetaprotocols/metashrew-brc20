@@ -2,7 +2,7 @@
   "version": "0.1.0",
   "main": "lib/index.js",
   "bin": {
-    "metashrew-ord": "./bin/metashrew-ord.js"
+    "metashrew-brc20": "./bin/metashrew-brc20.js"
   },
   "scripts": {
     "asbuild:debug": "asc assembly/index.ts --target debug --enable threads --config asconfig.json",
@@ -20,8 +20,11 @@
   },
   "dependencies": {
     "@protobuf-ts/plugin": "^2.9.4",
+    "as-bignum": "https://github.com/MaxGraey/as-bignum",
     "ethers": "^6.12.2",
-    "hdkey": "^2.1.0"
+    "hdkey": "^2.1.0",
+    "json-as": "^0.8.3",
+    "visitor-as": "^0.11.4"
   },
   "devDependencies": {
     "@protobuf-ts/protoc": "^2.9.4",
@@ -43,6 +46,6 @@
     "ts-mocha": "^10.0.0",
     "typescript": "^5.3.3"
   },
-  "name": "metashrew-ord",
-  "description": "metashrew-ord"
+  "name": "metashrew-brc20",
+  "description": "metashrew-brc20"
 }

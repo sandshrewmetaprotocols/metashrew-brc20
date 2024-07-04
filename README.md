@@ -1,10 +1,10 @@
 # metashrew-ord
 
-Implementation of [https://github.com/ordinals/ord](https://github.com/ordinals/ord) using BST structures for sat ranges.
+(TODO)
 
-No use of hardcoded block subsidies, so this implementation is compatible with Dogecoin, in addition to Bitcoin.
+Implementation of BRC20 metaprotocol built on the ordinals implementation of metashrew.
 
-Fork this repository to implement arbitrary metaprotocols that are built on inscriptions.
+Fork this repository to implement arbitrary metaprotocols that are built on BRC20.
 
 ## Author
 

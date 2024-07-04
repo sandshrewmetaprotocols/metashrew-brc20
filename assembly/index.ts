@@ -12,6 +12,8 @@ import { Height } from "metashrew-as/assembly/blockdata/height";
 import { Sat, SatPoint } from "metashrew-as/assembly/blockdata/sat";
 import { JUBILEE_HEIGHT } from "./constants";
 import { BST } from "metashrew-as/assembly/indexer/bst";
+import { ProtocolMessage } from "./brc20";
+import { JSON } from "json-as/assembly";
 
 import { ordinals } from "./protobuf";
 
@@ -272,6 +274,22 @@ class Index {
 	INSCRIPTION_ID_TO_SEQUENCE_NUMBER.select(inscriptionId).setValue<u64>(sequenceNumber);
 	INSCRIPTION_ID_TO_INSCRIPTION.select(inscriptionId).set(inscription.toArrayBuffer());
 	OUTPOINT_TO_SEQUENCE_NUMBERS.select(outpoint).appendValue<u64>(sequenceNumber);
+	const body = inscription.body();
+	if (body !== null) {
+          const parsed = JSON.parse<ProtocolMessage>(String.UTF8.decode(body));
+	  if (parsed.isBRC20()) {
+            if (parsed.isDeploy()) {
+              const deployMessage = parsed.toDeploy();
+	      console.log(parsed.op);
+	    } else if (parsed.isTransfer()) {
+              const transferMessage = parsed.toTransfer();
+	      console.log(parsed.op);
+	    } else if (parsed.isMint()) {
+              const mintMessage = parsed.toMint();
+	      console.log(parsed.op);
+	    }
+	  }
+	}
       } else {
         const previousOutput = reverseOutput(tx.ins[i].previousOutput().toArrayBuffer());
         const inscriptionsForOutpoint = OUTPOINT_TO_SEQUENCE_NUMBERS.select(previousOutput).getListValues<u64>();
