@@ -107,6 +107,13 @@ class SatRanges {
     return this;
   }
   static fromSats(sats: Array<u64>, rangeEnd: u64): SatRanges {
+	  /*
+    sats.sort((a: u64, b: u64) => {
+      if (a < b) return -1;
+      if (a > b) return 1;
+      return 0;
+    });
+   */
     const distances = new Array<u64>(max(sats.length, 1));
     for (let i = 0; i < sats.length; i++) {
       distances[i] = rangeLength<u64>(SAT_TO_OUTPOINT, sats[i], rangeEnd);
@@ -126,7 +133,7 @@ class SatRanges {
     return this;
   }
   static fromTransaction(tx: Transaction, rangeEnd: u64): SatRanges {
-    return SatRanges.fromSats(flatten(tx.ins.map<Array<u64>>((v: Input) => OUTPOINT_TO_SAT.select(reverseOutput(v.previousOutput().toArrayBuffer())).getListValues<u64>())), rangeEnd);
+    return SatRanges.fromSats(flatten(tx.ins.map<Array<u64>>((v: Input) => OUTPOINT_TO_SAT.select(v.previousOutput().toArrayBuffer()).getListValues<u64>())), rangeEnd);
   }
 }
 
@@ -217,7 +224,7 @@ class SatSink {
 }
 
 function setSat(sat: u64, outpoint: ArrayBuffer): void {
-  //console.log(sat.toString(10) + ':' + Box.from(outpoint).toHexString());
+//  console.log(sat.toString(10) + ":" + Box.from(outpoint).toHexString());
   SAT_TO_OUTPOINT.set(sat, outpoint);
   if (outpoint.byteLength === 0) SAT_TO_OUTPOINT.unmarkPath(sat);
 }
@@ -257,7 +264,7 @@ class Index {
         const sequenceNumber = NEXT_SEQUENCE_NUMBER.getValue<u64>();
 	const outpoint = OutPoint.from(txid, <u32>outputIndex).toArrayBuffer();
 	const satpoint = SatPoint.from(outpoint, <u64>offset).toArrayBuffer();
-	const value = OUTPOINT_TO_VALUE.select(reverseOutput(tx.ins[i].previousOutput().toArrayBuffer())).getValue<u64>();
+	const value = OUTPOINT_TO_VALUE.select(tx.ins[i].previousOutput().toArrayBuffer()).getValue<u64>();
 	offset += value;
 	if (offset >= tx.outs[outputIndex].value) {
           outputIndex++;
@@ -279,7 +286,7 @@ class Index {
           processInscriptionForBRC20(sequenceNumber, tx.outs[outputIndex].script, body);
 	}
       } else {
-        const previousOutput = reverseOutput(tx.ins[i].previousOutput().toArrayBuffer());
+        const previousOutput = tx.ins[i].previousOutput().toArrayBuffer();
         const inscriptionsForOutpoint = OUTPOINT_TO_SEQUENCE_NUMBERS.select(previousOutput).getListValues<u64>();
         for (let j = 0; j < inscriptionsForOutpoint.length; j++) {
           const inscriptionId = SEQUENCE_NUMBER_TO_INSCRIPTION_ID.selectValue<u64>(inscriptionsForOutpoint[j]).get();
@@ -308,7 +315,7 @@ class Index {
   static totalInputs(tx: Transaction): u64 {
     let total: u64 = 0;
     for (let i: i32 = 0; i < tx.ins.length; i++) {
-      total += OUTPOINT_TO_VALUE.select(reverseOutput(tx.ins[i].previousOutput().toArrayBuffer())).getValue<u64>();
+      total += OUTPOINT_TO_VALUE.select(tx.ins[i].previousOutput().toArrayBuffer()).getValue<u64>();
     }
     return total;
   }
@@ -332,6 +339,20 @@ class Index {
       Index.indexOutputValuesForTransaction(block.transactions[i]);
     }
   }
+  static sortOutPoints(tx: Transaction): void {
+    const txid = tx.txid();
+    for (let i = 0; i < tx.outs.length; i++) {
+      const outpoint = OutPoint.from(txid, i).toArrayBuffer();
+      const sats = OUTPOINT_TO_SAT.select(outpoint).getListValues<u64>().sort((a: u64, b: u64) => {
+	if (a < b) return -1;
+	if (a > b) return 1;
+	return 0;
+      });
+      for (let j = 0; j < sats.length; j++) {
+        OUTPOINT_TO_SAT.selectIndex(j).setValue<u64>(sats[j]);
+      }
+    }
+  }
   static indexBlock(height: u32, block: Block): void {
     HEIGHT_TO_BLOCKHASH.selectValue<u32>(height).set(block.blockhash());
     BLOCKHASH_TO_HEIGHT.select(block.blockhash()).setValue<u32>(height);
@@ -346,15 +367,14 @@ class Index {
 
     for (let i: i32 = 1; i < block.transactions.length; i++) {
       const tx = block.transactions[i];
-      //console.log('tx: ' + Box.from(tx.txid()).toHexString());
       const transactionSink = SatSink.fromTransaction(tx);
-      const transactionSource = SatSource.fromTransaction(tx, startingSat + reward).pull();
+      const transactionSource = SatSource.fromTransaction(tx, startingSat).pull();
       transactionSink.consume(transactionSource);
       const txid = tx.txid();
       if (!transactionSource.consumed()) coinbaseSink.consume(transactionSource);
+      if (!transactionSource.consumed() && coinbaseSink.filled()) excessSats(transactionSource);
       Index.indexTransactionInscriptions(tx, txid, height);
     }
-    
     excessSats(coinbaseSource);
   }
 }
@@ -419,7 +439,7 @@ export function sat(): ArrayBuffer {
   const response = new ordinals.SatResponse();
   const start = SAT_TO_OUTPOINT.seekLower(request.sat + 1);
   response.pointer = request.sat - start;
-  const outpoint = new OutPoint(Box.from(SAT_TO_OUTPOINT.get(start)));
+  const outpoint = new OutPoint(Box.from(reverseOutput(SAT_TO_OUTPOINT.get(start))));
   response.outpoint.hash = arrayBufferToArray(outpoint.txid.toArrayBuffer());
   response.outpoint.vout = outpoint.index;
   response.satrange.start = start;

@@ -88,6 +88,7 @@
  (global $~lib/metashrew-spendables/assembly/tables/OUTPOINTS_FOR_ADDRESS (mut i32) (i32.const 0))
  (global $~lib/metashrew-spendables/assembly/tables/OUTPOINT_SPENDABLE_BY (mut i32) (i32.const 0))
  (global $~lib/metashrew-spendables/assembly/tables/OUTPOINT_TO_OUTPUT (mut i32) (i32.const 0))
+ (global $~lib/metashrew-spendables/assembly/protobuf/__proto.MAX_POS i32 (i32.const 4096))
  (global $~lib/json-as/assembly/src/sink/MIN_BUFFER_LEN i32 (i32.const 32))
  (global $~lib/json-as/assembly/src/sink/MIN_BUFFER_SIZE i32 (i32.const 64))
  (global $~lib/json-as/assembly/src/sink/NEW_LINE_CHAR i32 (i32.const 10))
@@ -11534,39 +11535,6 @@
    end
   end
  )
- (func $assembly/index/reverseOutput (param $v i32) (result i32)
-  (local $1 i32)
-  (local $2 i32)
-  i32.const 2
-  i32.const 2
-  i32.const 29
-  i32.const 0
-  call $~lib/rt/__newArray
-  local.set $1
-  local.get $1
-  i32.load offset=4
-  local.set $2
-  local.get $1
-  i32.const 0
-  local.get $v
-  call $~lib/metashrew-as/assembly/utils/box/Box.from
-  i32.const 4
-  call $~lib/metashrew-as/assembly/utils/box/Box#shrinkBack
-  call $~lib/metashrew-as/assembly/utils/box/Box#toArrayBuffer
-  call $~lib/metashrew-as/assembly/utils/utils/reverse
-  call $~lib/metashrew-as/assembly/utils/box/Box.from
-  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#__set
-  local.get $1
-  i32.const 1
-  local.get $v
-  call $~lib/metashrew-as/assembly/utils/box/Box.from
-  i32.const 32
-  call $~lib/metashrew-as/assembly/utils/box/Box#shrinkFront
-  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#__set
-  local.get $1
-  call $~lib/metashrew-as/assembly/utils/box/Box.concat
-  return
- )
  (func $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#length (param $this i32) (result i32)
   local.get $this
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#lengthKey
@@ -11611,7 +11579,6 @@
   local.get $v
   call $~lib/metashrew-as/assembly/blockdata/transaction/Input#previousOutput
   call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#toArrayBuffer
-  call $assembly/index/reverseOutput
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
   call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#getListValues<u64>
  )
@@ -12809,6 +12776,94 @@
   drop
   local.get $this
   return
+ )
+ (func $~lib/polyfills/bswap<u16> (param $value i32) (result i32)
+  i32.const 1
+  drop
+  i32.const 2
+  i32.const 1
+  i32.eq
+  drop
+  i32.const 2
+  i32.const 2
+  i32.eq
+  drop
+  local.get $value
+  i32.const 8
+  i32.const 15
+  i32.and
+  i32.shl
+  local.get $value
+  i32.const 65535
+  i32.and
+  i32.const 8
+  i32.const 15
+  i32.and
+  i32.shr_u
+  i32.or
+  return
+ )
+ (func $assembly/index/excessSats (param $source i32)
+  (local $sourceRemaining i64)
+  (local $outpoint i32)
+  (local $sat i64)
+  loop $while-continue|0
+   local.get $source
+   call $assembly/index/SatSource#consumed
+   i32.eqz
+   if
+    local.get $source
+    call $assembly/index/SatSource#get:ranges
+    call $assembly/index/SatRanges#get:distances
+    local.get $source
+    call $assembly/index/SatSource#get:pointer
+    call $~lib/array/Array<u64>#__get
+    local.get $source
+    call $assembly/index/SatSource#get:offset
+    i64.sub
+    local.set $sourceRemaining
+    i32.const 0
+    i32.const 36
+    call $~lib/arraybuffer/ArrayBuffer#constructor
+    local.set $outpoint
+    local.get $outpoint
+    i32.const 34
+    i32.add
+    i32.const 57005
+    call $~lib/polyfills/bswap<u16>
+    i32.const 65535
+    i32.and
+    i32.store
+    local.get $source
+    call $assembly/index/SatSource#get:ranges
+    call $assembly/index/SatRanges#get:sats
+    local.get $source
+    call $assembly/index/SatSource#get:pointer
+    call $~lib/array/Array<u64>#__get
+    local.get $source
+    call $assembly/index/SatSource#get:offset
+    i64.add
+    local.set $sat
+    local.get $sat
+    local.get $outpoint
+    call $assembly/index/setSat
+    global.get $assembly/tables/OUTPOINT_TO_SAT
+    local.get $outpoint
+    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
+    local.get $sat
+    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#appendValue<u64>
+    local.get $source
+    i64.const 0
+    call $assembly/index/SatSource#set:offset
+    local.get $source
+    local.get $source
+    call $assembly/index/SatSource#get:pointer
+    i32.const 1
+    i32.add
+    call $assembly/index/SatSource#set:pointer
+    br $while-continue|0
+   end
+  end
  )
  (func $~lib/metashrew-as/assembly/blockdata/transaction/Input#get:witness (param $this i32) (result i32)
   local.get $this
@@ -18405,7 +18460,6 @@
       call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Input>#__get
       call $~lib/metashrew-as/assembly/blockdata/transaction/Input#previousOutput
       call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#toArrayBuffer
-      call $assembly/index/reverseOutput
       call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
       call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#getValue<u64>
       local.set $value
@@ -18508,7 +18562,6 @@
       call $~lib/array/Array<~lib/metashrew-as/assembly/blockdata/transaction/Input>#__get
       call $~lib/metashrew-as/assembly/blockdata/transaction/Input#previousOutput
       call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#toArrayBuffer
-      call $assembly/index/reverseOutput
       local.set $previousOutput
       global.get $assembly/tables/OUTPOINT_TO_SEQUENCE_NUMBERS
       local.get $previousOutput
@@ -18602,94 +18655,6 @@
    end
   end
  )
- (func $~lib/polyfills/bswap<u16> (param $value i32) (result i32)
-  i32.const 1
-  drop
-  i32.const 2
-  i32.const 1
-  i32.eq
-  drop
-  i32.const 2
-  i32.const 2
-  i32.eq
-  drop
-  local.get $value
-  i32.const 8
-  i32.const 15
-  i32.and
-  i32.shl
-  local.get $value
-  i32.const 65535
-  i32.and
-  i32.const 8
-  i32.const 15
-  i32.and
-  i32.shr_u
-  i32.or
-  return
- )
- (func $assembly/index/excessSats (param $source i32)
-  (local $sourceRemaining i64)
-  (local $outpoint i32)
-  (local $sat i64)
-  loop $while-continue|0
-   local.get $source
-   call $assembly/index/SatSource#consumed
-   i32.eqz
-   if
-    local.get $source
-    call $assembly/index/SatSource#get:ranges
-    call $assembly/index/SatRanges#get:distances
-    local.get $source
-    call $assembly/index/SatSource#get:pointer
-    call $~lib/array/Array<u64>#__get
-    local.get $source
-    call $assembly/index/SatSource#get:offset
-    i64.sub
-    local.set $sourceRemaining
-    i32.const 0
-    i32.const 36
-    call $~lib/arraybuffer/ArrayBuffer#constructor
-    local.set $outpoint
-    local.get $outpoint
-    i32.const 34
-    i32.add
-    i32.const 57005
-    call $~lib/polyfills/bswap<u16>
-    i32.const 65535
-    i32.and
-    i32.store
-    local.get $source
-    call $assembly/index/SatSource#get:ranges
-    call $assembly/index/SatRanges#get:sats
-    local.get $source
-    call $assembly/index/SatSource#get:pointer
-    call $~lib/array/Array<u64>#__get
-    local.get $source
-    call $assembly/index/SatSource#get:offset
-    i64.add
-    local.set $sat
-    local.get $sat
-    local.get $outpoint
-    call $assembly/index/setSat
-    global.get $assembly/tables/OUTPOINT_TO_SAT
-    local.get $outpoint
-    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#select
-    local.get $sat
-    call $~lib/metashrew-as/assembly/indexer/tables/IndexPointer#appendValue<u64>
-    local.get $source
-    i64.const 0
-    call $assembly/index/SatSource#set:offset
-    local.get $source
-    local.get $source
-    call $assembly/index/SatSource#get:pointer
-    i32.const 1
-    i32.add
-    call $assembly/index/SatSource#set:pointer
-    br $while-continue|0
-   end
-  end
- )
  (func $assembly/index/Index.indexBlock (param $height i32) (param $block i32)
   (local $coinbase i32)
   (local $startingSat i64)
@@ -18759,8 +18724,6 @@
     local.set $transactionSink
     local.get $tx
     local.get $startingSat
-    local.get $reward
-    i64.add
     call $assembly/index/SatSource.fromTransaction
     call $assembly/index/SatSource#pull
     local.set $transactionSource
@@ -18777,6 +18740,19 @@
      local.get $coinbaseSink
      local.get $transactionSource
      call $assembly/index/SatSink#consume
+    end
+    local.get $transactionSource
+    call $assembly/index/SatSource#consumed
+    i32.eqz
+    if (result i32)
+     local.get $coinbaseSink
+     call $assembly/index/SatSink#filled
+    else
+     i32.const 0
+    end
+    if
+     local.get $transactionSource
+     call $assembly/index/excessSats
     end
     local.get $tx
     local.get $txid
@@ -22905,6 +22881,39 @@
   local.get $this
   i64.load
  )
+ (func $assembly/index/reverseOutput (param $v i32) (result i32)
+  (local $1 i32)
+  (local $2 i32)
+  i32.const 2
+  i32.const 2
+  i32.const 29
+  i32.const 0
+  call $~lib/rt/__newArray
+  local.set $1
+  local.get $1
+  i32.load offset=4
+  local.set $2
+  local.get $1
+  i32.const 0
+  local.get $v
+  call $~lib/metashrew-as/assembly/utils/box/Box.from
+  i32.const 4
+  call $~lib/metashrew-as/assembly/utils/box/Box#shrinkBack
+  call $~lib/metashrew-as/assembly/utils/box/Box#toArrayBuffer
+  call $~lib/metashrew-as/assembly/utils/utils/reverse
+  call $~lib/metashrew-as/assembly/utils/box/Box.from
+  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#__set
+  local.get $1
+  i32.const 1
+  local.get $v
+  call $~lib/metashrew-as/assembly/utils/box/Box.from
+  i32.const 32
+  call $~lib/metashrew-as/assembly/utils/box/Box#shrinkFront
+  call $~lib/array/Array<~lib/metashrew-as/assembly/utils/box/Box>#__set
+  local.get $1
+  call $~lib/metashrew-as/assembly/utils/box/Box.concat
+  return
+ )
  (func $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#get:txid (param $this i32) (result i32)
   local.get $this
   i32.load offset=4
@@ -23326,6 +23335,7 @@
   global.get $assembly/tables/SAT_TO_OUTPOINT
   local.get $start
   call $~lib/metashrew-as/assembly/indexer/bst/BST<u64>#get
+  call $assembly/index/reverseOutput
   call $~lib/metashrew-as/assembly/utils/box/Box.from
   call $~lib/metashrew-as/assembly/blockdata/transaction/OutPoint#constructor
   local.set $outpoint

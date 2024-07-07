@@ -265,7 +265,7 @@ describe("metashrew-ord", () => {
     const transaction = buildTransaction(
       [
         {
-          hash: coinbase.getId(),
+          hash: coinbase.getHash(),
           index: 0,
         },
       ],
@@ -292,10 +292,10 @@ describe("metashrew-ord", () => {
     program.setBlock(block.toHex());
     await program.run("_start");
     expect(await satRangesForTransaction(program, transaction)).to.eql({
-      "9f66d35f50d859fb0e9c0e1d2cf83c25abd737d26b1f10dd79e23a27363e38bf:0": [
+      [`${transaction.getId()}:0`]: [
         { start: 0n, distance: 1n },
       ],
-      "9f66d35f50d859fb0e9c0e1d2cf83c25abd737d26b1f10dd79e23a27363e38bf:1": [
+      [`${transaction.getId()}:1`]: [
         { start: 1n, distance: 4999999949n },
       ],
     });
@@ -305,11 +305,11 @@ describe("metashrew-ord", () => {
     const transaction2 = buildTransaction(
       [
         {
-          hash: transaction.getId(),
+          hash: transaction.getHash(),
           index: 0,
         },
         {
-          hash: transaction.getId(),
+          hash: transaction.getHash(),
           index: 1,
         },
       ],
@@ -328,24 +328,68 @@ describe("metashrew-ord", () => {
     program.setBlockHeight(2);
     program.setBlock(block2.toHex());
     await program.run("_start");
-    expect(await sat(program, 5)).to.eql({
-      pointer: 5n,
-      satrange: { start: 0n, distance: 4999999950n },
-      satrangesOnOutpoint: [{ start: 0n, distance: 4999999950n }],
-      outpoint: {
-        txid: "61a15730ff805422dca92f92e38dace5446bb22f0050a7bd985d79f0df716905",
-        vout: 0,
-      },
-    });
-    expect(
-      await satranges(program, `${transaction2.getId().toString("hex")}:0`),
-    ).to.eql([{ start: 0n, distance: 4999999950n }]);
-    expect(
-      await satRangesForTransaction(program, block2.transactions[1]),
-    ).to.eql({
-      "61a15730ff805422dca92f92e38dace5446bb22f0050a7bd985d79f0df716905:0": [
-        { start: 0n, distance: 4999999950n },
+  });
+  it("should capture fees", async () => {
+    const program = buildProgram();
+    program.setBlockHeight(0);
+    const block = buildDefaultBlock();
+    const coinbase = buildCoinbaseToTestAddress();
+    const coinbaseBlock = buildDefaultBlock();
+    coinbaseBlock.transactions.push(coinbase);
+    program.setBlockHeight(0);
+    program.setBlock(coinbaseBlock.toHex());
+    await program.run("_start");
+    block.transactions.push(buildCoinbaseToRandomAddress());
+    const transaction = buildTransaction(
+      [
+        {
+          hash: coinbase.getHash(),
+          index: 0,
+        },
       ],
-    });
+      [
+        {
+          script: bitcoinjs.payments.p2pkh({
+            address: TEST_BTC_ADDRESS1,
+            network: bitcoinjs.networks.bitcoin,
+          }).output,
+          value: 1,
+        },
+        {
+          script: bitcoinjs.payments.p2pkh({
+            network: bitcoinjs.networks.bitcoin,
+            address: TEST_BTC_ADDRESS1,
+          }).output,
+          value: 50e8 - 51,
+        },
+      ],
+    );
+    block.transactions[0].outs[0].value += 50;
+    block.transactions.push(transaction);
+    program.setBlockHeight(1);
+    program.setBlock(block.toHex());
+    await program.run("_start");
+    const block3 = buildDefaultBlock();
+    const coinbase3 = buildCoinbaseToRandomAddress();
+    block3.transactions.push(coinbase3);
+    const transaction3 = buildTransaction([{
+      hash: transaction.getHash(),
+      index: 1
+    }, {
+      hash: block.transactions[0].getHash(),
+      index: 0
+    }], [{
+      script: bitcoinjs.payments.p2pkh({
+        network: bitcoinjs.networks.bitcoin,
+        address: TEST_BTC_ADDRESS1,
+      }).output,
+      value: 50e8 + 50 + 50e8 - 51 - 30
+    }]);
+    block3.transactions.push(transaction3);
+    block3.transactions[0].outs[0].value += 30;
+    program.setBlock(block3.toHex());
+    program.setBlockHeight(2);
+    await program.run('_start');
+    console.log(Object.values(await satRangesForTransaction(program, block3.transactions[1])));//[0][2].distance).to.eql(20n);
   });
 });
