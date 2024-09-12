@@ -70,6 +70,12 @@ export function processInscriptionForBRC20(sequenceNumber: u64, script: Box, bod
       if (receiverAddress !== null) {
 	const transferMessage = parsed.toTransfer();
         const unspentPointer = pointer.keyword("/unspent/").select(receiverAddress as ArrayBuffer);
+	const receiverPointer = BRC20_INDEX.keyword("tickers/").select(receiverAddress as ArrayBuffer);
+	const seenPointer = receiverPointer.keyword("/seen/").keyword(parsed.tick);
+	if (seenPointer.get().byteLength === 0) {
+          seenPointer.setValue<u8>(0x01);
+	  receiverPointer.append(String.UTF8.encode(parsed.tick));
+	}
         const unspent = u128FromArrayBuffer(unspentPointer.get());
         const available = u128FromArrayBuffer(pointer.keyword("/balances/").select(receiverAddress as ArrayBuffer).get()) - unspent;
         if (available >= transferMessage.amt) {
@@ -95,6 +101,12 @@ export function processInscriptionForBRC20(sequenceNumber: u64, script: Box, bod
 	    tPointer.setValue<u32>(1);
 	    tPointer.keyword("/holders").append(receiverAddress as ArrayBuffer);
 	  }
+	  const receiverPointer = BRC20_INDEX.keyword("tickers/").select(receiverAddress as ArrayBuffer);
+	  const seenPointer = receiverPointer.keyword("/seen/").keyword(parsed.tick);
+	  if (seenPointer.get().byteLength === 0) {
+            seenPointer.setValue<u8>(0x01);
+	    receiverPointer.append(String.UTF8.encode(parsed.tick));
+          }
         }
       }
     }
