@@ -13,6 +13,37 @@ let id = 0;
 
 const toBeArray = (v) => v === '0x' ? new Uint8Array() : ethers.toBeArray(v);
 
+export function decodeBrc20ByAddressResponse(hex: string): {
+  outpoints: Array<{
+    hash: string;
+    vout: number;
+  }>;
+  brc20s: Array<{
+    tick: string;
+    balance: bigint;
+  }>;
+} {
+  if (!hex || hex === "0x") {
+    return { brc20s: [], outpoints: [] };
+  }
+  const buffer = Buffer.from(stripHexPrefix(hex), "hex");
+  if (buffer.length === 0) {
+    return { brc20s: [], outpoints: [] };
+  }
+  const response = ordinals.Brc20ByAddressResponse.fromBinary(buffer);
+
+  return {
+    brc20s: response.brc20S.map((brc20) => ({
+      tick: Buffer.from(brc20.tick).toString("utf8"),
+      balance: BigInt(brc20.balance),
+    })),
+    outpoints: response.outpoints.map((outpoint) => ({
+      hash: Buffer.from(outpoint.hash).toString("utf8"),
+      vout: Number(outpoint.vout),
+    })),
+  };
+}
+
 export class MetashrewOrd {
   public baseUrl: string;
   public blockTag: string;

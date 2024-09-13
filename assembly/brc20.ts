@@ -52,6 +52,7 @@ export function defaultToMax(v: u128 | null): u128 {
 }
 
 export function processInscriptionForBRC20(
+  outpoint: ArrayBuffer,
   sequenceNumber: u64,
   script: Box,
   body: ArrayBuffer
@@ -102,6 +103,7 @@ export function processInscriptionForBRC20(
           BRC20_INDEX.keyword("/unspent/")
             .selectValue<u64>(sequenceNumber)
             .set(body);
+          BRC20_INDEX.keyword("/sequence/byoutpoint/").select(outpoint).setValue<u64>(sequenceNumber);
           unspentPointer.set(u128ToArrayBuffer(unspent + transferMessage.amt));
         }
       }
