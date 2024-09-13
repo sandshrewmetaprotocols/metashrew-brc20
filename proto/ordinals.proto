@@ -34,3 +34,17 @@ message SatResponse {
   OutPoint outpoint = 3;
   SatRanges satranges = 4;
 }
+
+message Brc20ByAddressRequest {
+  bytes address = 1;
+}
+
+message Brc20ByAddressResponse {
+  repeated OutPoint outpoints = 1;
+  repeated Brc20 brc20s = 2;
+}
+
+message Brc20 {
+  bytes tick = 1;
+  uint64 balance = 2;
+}

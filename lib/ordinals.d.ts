@@ -87,6 +87,41 @@ export interface SatResponse {
      */
     satranges?: SatRanges;
 }
+/**
+ * @generated from protobuf message ordinals.Brc20ByAddressRequest
+ */
+export interface Brc20ByAddressRequest {
+    /**
+     * @generated from protobuf field: bytes address = 1;
+     */
+    address: Uint8Array;
+}
+/**
+ * @generated from protobuf message ordinals.Brc20ByAddressResponse
+ */
+export interface Brc20ByAddressResponse {
+    /**
+     * @generated from protobuf field: repeated ordinals.OutPoint outpoints = 1;
+     */
+    outpoints: OutPoint[];
+    /**
+     * @generated from protobuf field: repeated ordinals.Brc20 brc20s = 2 [json_name = "brc20s"];
+     */
+    brc20S: Brc20[];
+}
+/**
+ * @generated from protobuf message ordinals.Brc20
+ */
+export interface Brc20 {
+    /**
+     * @generated from protobuf field: bytes tick = 1;
+     */
+    tick: Uint8Array;
+    /**
+     * @generated from protobuf field: uint64 balance = 2;
+     */
+    balance: bigint;
+}
 declare class OutPoint$Type extends MessageType<OutPoint> {
     constructor();
     create(value?: PartialMessage<OutPoint>): OutPoint;
@@ -157,4 +192,34 @@ declare class SatResponse$Type extends MessageType<SatResponse> {
  * @generated MessageType for protobuf message ordinals.SatResponse
  */
 export declare const SatResponse: SatResponse$Type;
+declare class Brc20ByAddressRequest$Type extends MessageType<Brc20ByAddressRequest> {
+    constructor();
+    create(value?: PartialMessage<Brc20ByAddressRequest>): Brc20ByAddressRequest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Brc20ByAddressRequest): Brc20ByAddressRequest;
+    internalBinaryWrite(message: Brc20ByAddressRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message ordinals.Brc20ByAddressRequest
+ */
+export declare const Brc20ByAddressRequest: Brc20ByAddressRequest$Type;
+declare class Brc20ByAddressResponse$Type extends MessageType<Brc20ByAddressResponse> {
+    constructor();
+    create(value?: PartialMessage<Brc20ByAddressResponse>): Brc20ByAddressResponse;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Brc20ByAddressResponse): Brc20ByAddressResponse;
+    internalBinaryWrite(message: Brc20ByAddressResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message ordinals.Brc20ByAddressResponse
+ */
+export declare const Brc20ByAddressResponse: Brc20ByAddressResponse$Type;
+declare class Brc20$Type extends MessageType<Brc20> {
+    constructor();
+    create(value?: PartialMessage<Brc20>): Brc20;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Brc20): Brc20;
+    internalBinaryWrite(message: Brc20, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message ordinals.Brc20
+ */
+export declare const Brc20: Brc20$Type;
 export {};

@@ -1301,4 +1301,266 @@ export namespace ordinals {
       return buf;
     } // encode SatResponse
   } // SatResponse
+
+  export class Brc20ByAddressRequest {
+    public address: Array<u8> = new Array<u8>();
+
+    // Decodes Brc20ByAddressRequest from an ArrayBuffer
+    static decode(buf: ArrayBuffer): Brc20ByAddressRequest {
+      return Brc20ByAddressRequest.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes Brc20ByAddressRequest from a DataView
+    static decodeDataView(view: DataView): Brc20ByAddressRequest {
+      const decoder = new __proto.SafeDecoder(view);
+      const obj = new Brc20ByAddressRequest();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            obj.address = decoder.bytes();
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      if (decoder.invalid()) return changetype<Brc20ByAddressRequest>(0);
+      return obj;
+    } // decode Brc20ByAddressRequest
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      size +=
+        this.address.length > 0
+          ? 1 +
+            __proto.Sizer.varint64(this.address.length) +
+            this.address.length
+          : 0;
+
+      return size;
+    }
+
+    // Encodes Brc20ByAddressRequest to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes Brc20ByAddressRequest to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      if (this.address.length > 0) {
+        encoder.uint32(0xa);
+        encoder.uint32(this.address.length);
+        encoder.bytes(this.address);
+      }
+
+      return buf;
+    } // encode Brc20ByAddressRequest
+  } // Brc20ByAddressRequest
+
+  export class Brc20ByAddressResponse {
+    public outpoints: Array<OutPoint> = new Array<OutPoint>();
+    public brc20s: Array<Brc20> = new Array<Brc20>();
+
+    // Decodes Brc20ByAddressResponse from an ArrayBuffer
+    static decode(buf: ArrayBuffer): Brc20ByAddressResponse {
+      return Brc20ByAddressResponse.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes Brc20ByAddressResponse from a DataView
+    static decodeDataView(view: DataView): Brc20ByAddressResponse {
+      const decoder = new __proto.SafeDecoder(view);
+      const obj = new Brc20ByAddressResponse();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            const length = decoder.uint32();
+            obj.outpoints.push(
+              OutPoint.decodeDataView(
+                new DataView(
+                  decoder.view.buffer,
+                  decoder.pos + decoder.view.byteOffset,
+                  length
+                )
+              )
+            );
+            decoder.skip(length);
+
+            break;
+          }
+          case 2: {
+            const length = decoder.uint32();
+            obj.brc20s.push(
+              Brc20.decodeDataView(
+                new DataView(
+                  decoder.view.buffer,
+                  decoder.pos + decoder.view.byteOffset,
+                  length
+                )
+              )
+            );
+            decoder.skip(length);
+
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      if (decoder.invalid()) return changetype<Brc20ByAddressResponse>(0);
+      return obj;
+    } // decode Brc20ByAddressResponse
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      for (let n: i32 = 0; n < this.outpoints.length; n++) {
+        const messageSize = this.outpoints[n].size();
+
+        if (messageSize > 0) {
+          size += 1 + __proto.Sizer.varint64(messageSize) + messageSize;
+        }
+      }
+
+      for (let n: i32 = 0; n < this.brc20s.length; n++) {
+        const messageSize = this.brc20s[n].size();
+
+        if (messageSize > 0) {
+          size += 1 + __proto.Sizer.varint64(messageSize) + messageSize;
+        }
+      }
+
+      return size;
+    }
+
+    // Encodes Brc20ByAddressResponse to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes Brc20ByAddressResponse to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      for (let n: i32 = 0; n < this.outpoints.length; n++) {
+        const messageSize = this.outpoints[n].size();
+
+        if (messageSize > 0) {
+          encoder.uint32(0xa);
+          encoder.uint32(messageSize);
+          this.outpoints[n].encodeU8Array(encoder);
+        }
+      }
+
+      for (let n: i32 = 0; n < this.brc20s.length; n++) {
+        const messageSize = this.brc20s[n].size();
+
+        if (messageSize > 0) {
+          encoder.uint32(0x12);
+          encoder.uint32(messageSize);
+          this.brc20s[n].encodeU8Array(encoder);
+        }
+      }
+
+      return buf;
+    } // encode Brc20ByAddressResponse
+  } // Brc20ByAddressResponse
+
+  export class Brc20 {
+    public tick: Array<u8> = new Array<u8>();
+    public balance: u64;
+
+    // Decodes Brc20 from an ArrayBuffer
+    static decode(buf: ArrayBuffer): Brc20 {
+      return Brc20.decodeDataView(new DataView(buf));
+    }
+
+    // Decodes Brc20 from a DataView
+    static decodeDataView(view: DataView): Brc20 {
+      const decoder = new __proto.SafeDecoder(view);
+      const obj = new Brc20();
+
+      while (!decoder.eof()) {
+        const tag = decoder.tag();
+        const number = tag >>> 3;
+
+        switch (number) {
+          case 1: {
+            obj.tick = decoder.bytes();
+            break;
+          }
+          case 2: {
+            obj.balance = decoder.uint64();
+            break;
+          }
+
+          default:
+            decoder.skipType(tag & 7);
+            break;
+        }
+      }
+      if (decoder.invalid()) return changetype<Brc20>(0);
+      return obj;
+    } // decode Brc20
+
+    public size(): u32 {
+      let size: u32 = 0;
+
+      size +=
+        this.tick.length > 0
+          ? 1 + __proto.Sizer.varint64(this.tick.length) + this.tick.length
+          : 0;
+      size += this.balance == 0 ? 0 : 1 + __proto.Sizer.uint64(this.balance);
+
+      return size;
+    }
+
+    // Encodes Brc20 to the ArrayBuffer
+    encode(): ArrayBuffer {
+      return changetype<ArrayBuffer>(
+        StaticArray.fromArray<u8>(this.encodeU8Array())
+      );
+    }
+
+    // Encodes Brc20 to the Array<u8>
+    encodeU8Array(
+      encoder: __proto.Encoder = new __proto.Encoder(new Array<u8>())
+    ): Array<u8> {
+      const buf = encoder.buf;
+
+      if (this.tick.length > 0) {
+        encoder.uint32(0xa);
+        encoder.uint32(this.tick.length);
+        encoder.bytes(this.tick);
+      }
+      if (this.balance != 0) {
+        encoder.uint32(0x10);
+        encoder.uint64(this.balance);
+      }
+
+      return buf;
+    } // encode Brc20
+  } // Brc20
 } // ordinals

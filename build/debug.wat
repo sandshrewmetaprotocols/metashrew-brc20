@@ -130,7 +130,7 @@
  (global $~lib/as-bignum/assembly/integer/u128/HEX_CHARS i32 (i32.const 8320))
  (global $~lib/as-bignum/assembly/utils/RadixCharsTable i32 (i32.const 8508))
  (global $~lib/as-bignum/assembly/globals/__res128_hi (mut i64) (i64.const 0))
- (global $~lib/memory/__heap_base i32 (i32.const 9596))
+ (global $~lib/memory/__heap_base i32 (i32.const 9644))
  (memory $0 1 65335)
  (data $0 (i32.const 12) "\1c\02\00\00\00\00\00\00\00\00\00\00\04\00\00\00\00\02\00\00000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f505152535455565758595a5b5c5d5e5f606162636465666768696a6b6c6d6e6f707172737475767778797a7b7c7d7e7f808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9fa0a1a2a3a4a5a6a7a8a9aaabacadaeafb0b1b2b3b4b5b6b7b8b9babbbcbdbebfc0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f8f9fafbfcfdfeff\00\00\00\00\00\00\00\00\00\00\00\00")
  (data $1 (i32.const 556) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00(\00\00\00A\00l\00l\00o\00c\00a\00t\00i\00o\00n\00 \00t\00o\00o\00 \00l\00a\00r\00g\00e\00\00\00\00\00")
@@ -239,15 +239,16 @@
  (data $104 (i32.const 9036) "\1c\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\08\00\00\00m\00i\00n\00t\00\00\00\00\00")
  (data $105 (i32.const 9068) "\1c\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\0c\00\00\00/\00t\00o\00t\00a\00l\00")
  (data $106 (i32.const 9100) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\10\00\00\00/\00h\00o\00l\00d\00e\00r\00s\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $107 (i32.const 9148) ",\00\00\00\03\00\00\00\00\00\00\007\00\00\00\14\00\00\00\a0\1c\00\00\00\00\00\00\f0\1c\00\00\00\00\00\00 \1d\00\00\00\00\00\00\00\00\00\00")
- (data $108 (i32.const 9196) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\12\00\00\00/\00b\00a\00l\00a\00n\00c\00e\00s\00\00\00\00\00\00\00\00\00\00\00")
- (data $109 (i32.const 9244) "\1c\00\00\00\00\00\00\00\00\00\00\00A\00\00\00\08\00\00\00\06\00\00\00\00\00\00\00\00\00\00\00")
- (data $110 (i32.const 9276) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00 \00\00\00~\00l\00i\00b\00/\00d\00a\00t\00a\00v\00i\00e\00w\00.\00t\00s\00\00\00\00\00\00\00\00\00\00\00\00\00")
- (data $111 (i32.const 9340) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\"\00\00\00D\00e\00c\00o\00d\00e\00r\00 \00p\00o\00s\00i\00t\00i\00o\00n\00 \00\00\00\00\00\00\00\00\00\00\00")
- (data $112 (i32.const 9404) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\"\00\00\00 \00i\00s\00 \00o\00u\00t\00 \00o\00f\00 \00r\00a\00n\00g\00e\00!\00\00\00\00\00\00\00\00\00\00\00")
- (data $113 (i32.const 9468) "\1c\00\00\00\03\00\00\00\00\00\00\007\00\00\00\0c\00\00\00\90$\00\00\00\00\00\00\d0$\00\00")
- (data $114 (i32.const 9500) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00(\00\00\00a\00s\00s\00e\00m\00b\00l\00y\00/\00p\00r\00o\00t\00o\00b\00u\00f\00.\00t\00s\00\00\00\00\00")
- (data $115 (i32.const 9564) "\1c\00\00\00\00\00\00\00\00\00\00\00M\00\00\00\08\00\00\00\07\00\00\00\00\00\00\00\00\00\00\00")
+ (data $107 (i32.const 9148) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\12\00\00\00/\00t\00i\00c\00k\00e\00r\00s\00/\00\00\00\00\00\00\00\00\00\00\00")
+ (data $108 (i32.const 9196) ",\00\00\00\03\00\00\00\00\00\00\007\00\00\00\14\00\00\00\a0\1c\00\00\00\00\00\00\f0\1c\00\00\00\00\00\00 \1d\00\00\00\00\00\00\00\00\00\00")
+ (data $109 (i32.const 9244) ",\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\12\00\00\00/\00b\00a\00l\00a\00n\00c\00e\00s\00\00\00\00\00\00\00\00\00\00\00")
+ (data $110 (i32.const 9292) "\1c\00\00\00\00\00\00\00\00\00\00\00A\00\00\00\08\00\00\00\06\00\00\00\00\00\00\00\00\00\00\00")
+ (data $111 (i32.const 9324) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00 \00\00\00~\00l\00i\00b\00/\00d\00a\00t\00a\00v\00i\00e\00w\00.\00t\00s\00\00\00\00\00\00\00\00\00\00\00\00\00")
+ (data $112 (i32.const 9388) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\"\00\00\00D\00e\00c\00o\00d\00e\00r\00 \00p\00o\00s\00i\00t\00i\00o\00n\00 \00\00\00\00\00\00\00\00\00\00\00")
+ (data $113 (i32.const 9452) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00\"\00\00\00 \00i\00s\00 \00o\00u\00t\00 \00o\00f\00 \00r\00a\00n\00g\00e\00!\00\00\00\00\00\00\00\00\00\00\00")
+ (data $114 (i32.const 9516) "\1c\00\00\00\03\00\00\00\00\00\00\007\00\00\00\0c\00\00\00\c0$\00\00\00\00\00\00\00%\00\00")
+ (data $115 (i32.const 9548) "<\00\00\00\00\00\00\00\00\00\00\00\02\00\00\00(\00\00\00a\00s\00s\00e\00m\00b\00l\00y\00/\00p\00r\00o\00t\00o\00b\00u\00f\00.\00t\00s\00\00\00\00\00")
+ (data $116 (i32.const 9612) "\1c\00\00\00\00\00\00\00\00\00\00\00M\00\00\00\08\00\00\00\07\00\00\00\00\00\00\00\00\00\00\00")
  (table $0 8 8 funcref)
  (elem $0 (i32.const 1) $~lib/metashrew-as/assembly/utils/utils/concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|1 $assembly/index/SatRanges.fromTransaction~anonymous|0 $assembly/index/SatRanges#pull~anonymous|0 $~lib/metashrew-as/assembly/indexer/index/_flush~anonymous|0 $assembly/index/outpointToSatRanges~anonymous|0)
  (export "trap" (func $assembly/index/trap))
@@ -15001,7 +15002,7 @@
   else
    i32.const 7792
    i32.const 7920
-   i32.const 189
+   i32.const 261
    i32.const 10
    call $~lib/builtins/abort
    unreachable
@@ -15024,7 +15025,7 @@
   else
    i32.const 7792
    i32.const 7920
-   i32.const 191
+   i32.const 263
    i32.const 10
    call $~lib/builtins/abort
    unreachable
@@ -15040,7 +15041,7 @@
   else
    i32.const 7792
    i32.const 7920
-   i32.const 190
+   i32.const 262
    i32.const 10
    call $~lib/builtins/abort
    unreachable
@@ -16094,8 +16095,8 @@
    else
     i32.const 7792
     i32.const 7920
-    i32.const 212
-    i32.const 30
+    i32.const 284
+    i32.const 29
     call $~lib/builtins/abort
     unreachable
    end
@@ -16118,8 +16119,8 @@
    else
     i32.const 7792
     i32.const 7920
-    i32.const 215
-    i32.const 30
+    i32.const 287
+    i32.const 29
     call $~lib/builtins/abort
     unreachable
    end
@@ -17457,8 +17458,8 @@
    else
     i32.const 7792
     i32.const 7920
-    i32.const 229
-    i32.const 75
+    i32.const 303
+    i32.const 34
     call $~lib/builtins/abort
     unreachable
    end
@@ -17745,7 +17746,7 @@
    else
     i32.const 7792
     i32.const 7920
-    i32.const 222
+    i32.const 294
     i32.const 29
     call $~lib/builtins/abort
     unreachable
@@ -17873,8 +17874,8 @@
    else
     i32.const 7792
     i32.const 7920
-    i32.const 235
-    i32.const 77
+    i32.const 317
+    i32.const 34
     call $~lib/builtins/abort
     unreachable
    end
@@ -18077,7 +18078,7 @@
   else
    i32.const 7792
    i32.const 7920
-   i32.const 206
+   i32.const 278
    i32.const 31
    call $~lib/builtins/abort
    unreachable
@@ -18200,8 +18201,8 @@
    else
     i32.const 7792
     i32.const 7920
-    i32.const 232
-    i32.const 73
+    i32.const 311
+    i32.const 34
     call $~lib/builtins/abort
     unreachable
    end
@@ -18711,15 +18712,15 @@
    local.set $8
    i32.const 7632
    local.set $9
-   i32.const 9168
+   i32.const 9216
    i32.const 1
    local.get $8
    call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-   i32.const 9168
+   i32.const 9216
    i32.const 3
    local.get $9
    call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-   i32.const 9168
+   i32.const 9216
    i32.const 7072
    call $~lib/staticarray/StaticArray<~lib/string/String>#join
    i32.const 7696
@@ -19885,7 +19886,7 @@
   call $~lib/array/Array<~lib/array/Array<u8>>#constructor
   local.set $protobufInput
   local.get $hashKeys
-  i32.const 9264
+  i32.const 9312
   local.get $protobufInput
   call $~lib/array/Array<~lib/string/String>#reduce<~lib/array/Array<~lib/array/Array<u8>>>
   drop
@@ -19978,7 +19979,7 @@
   i32.or
   if
    i32.const 1584
-   i32.const 9296
+   i32.const 9344
    i32.const 25
    i32.const 7
    call $~lib/builtins/abort
@@ -20216,7 +20217,7 @@
   i32.ge_u
   if
    i32.const 2320
-   i32.const 9296
+   i32.const 9344
    i32.const 72
    i32.const 50
    call $~lib/builtins/abort
@@ -20960,14 +20961,14 @@
    i32.const 10
    call $~lib/number/I32#toString
    local.set $54
-   i32.const 9488
+   i32.const 9536
    i32.const 1
    local.get $54
    call $~lib/staticarray/StaticArray<~lib/string/String>#__uset
-   i32.const 9488
+   i32.const 9536
    i32.const 7072
    call $~lib/staticarray/StaticArray<~lib/string/String>#join
-   i32.const 9520
+   i32.const 9568
    i32.const 278
    i32.const 7
    call $~lib/builtins/abort
@@ -22471,7 +22472,7 @@
   call $assembly/protobuf/ordinals.SatRanges#constructor
   local.set $result
   local.get $sats
-  i32.const 9584
+  i32.const 9632
   call $~lib/array/Array<u64>#map<u64>
   local.set $distances
   i32.const 0

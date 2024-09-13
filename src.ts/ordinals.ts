@@ -93,6 +93,41 @@ export interface SatResponse {
      */
     satranges?: SatRanges;
 }
+/**
+ * @generated from protobuf message ordinals.Brc20ByAddressRequest
+ */
+export interface Brc20ByAddressRequest {
+    /**
+     * @generated from protobuf field: bytes address = 1;
+     */
+    address: Uint8Array;
+}
+/**
+ * @generated from protobuf message ordinals.Brc20ByAddressResponse
+ */
+export interface Brc20ByAddressResponse {
+    /**
+     * @generated from protobuf field: repeated ordinals.OutPoint outpoints = 1;
+     */
+    outpoints: OutPoint[];
+    /**
+     * @generated from protobuf field: repeated ordinals.Brc20 brc20s = 2 [json_name = "brc20s"];
+     */
+    brc20S: Brc20[];
+}
+/**
+ * @generated from protobuf message ordinals.Brc20
+ */
+export interface Brc20 {
+    /**
+     * @generated from protobuf field: bytes tick = 1;
+     */
+    tick: Uint8Array;
+    /**
+     * @generated from protobuf field: uint64 balance = 2;
+     */
+    balance: bigint;
+}
 // @generated message type with reflection information, may provide speed optimized methods
 class OutPoint$Type extends MessageType<OutPoint> {
     constructor() {
@@ -457,3 +492,160 @@ class SatResponse$Type extends MessageType<SatResponse> {
  * @generated MessageType for protobuf message ordinals.SatResponse
  */
 export const SatResponse = new SatResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Brc20ByAddressRequest$Type extends MessageType<Brc20ByAddressRequest> {
+    constructor() {
+        super("ordinals.Brc20ByAddressRequest", [
+            { no: 1, name: "address", kind: "scalar", T: 12 /*ScalarType.BYTES*/ }
+        ]);
+    }
+    create(value?: PartialMessage<Brc20ByAddressRequest>): Brc20ByAddressRequest {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.address = new Uint8Array(0);
+        if (value !== undefined)
+            reflectionMergePartial<Brc20ByAddressRequest>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Brc20ByAddressRequest): Brc20ByAddressRequest {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bytes address */ 1:
+                    message.address = reader.bytes();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: Brc20ByAddressRequest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* bytes address = 1; */
+        if (message.address.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.address);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message ordinals.Brc20ByAddressRequest
+ */
+export const Brc20ByAddressRequest = new Brc20ByAddressRequest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Brc20ByAddressResponse$Type extends MessageType<Brc20ByAddressResponse> {
+    constructor() {
+        super("ordinals.Brc20ByAddressResponse", [
+            { no: 1, name: "outpoints", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => OutPoint },
+            { no: 2, name: "brc20s", kind: "message", jsonName: "brc20s", repeat: 1 /*RepeatType.PACKED*/, T: () => Brc20 }
+        ]);
+    }
+    create(value?: PartialMessage<Brc20ByAddressResponse>): Brc20ByAddressResponse {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.outpoints = [];
+        message.brc20S = [];
+        if (value !== undefined)
+            reflectionMergePartial<Brc20ByAddressResponse>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Brc20ByAddressResponse): Brc20ByAddressResponse {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* repeated ordinals.OutPoint outpoints */ 1:
+                    message.outpoints.push(OutPoint.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* repeated ordinals.Brc20 brc20s = 2 [json_name = "brc20s"];*/ 2:
+                    message.brc20S.push(Brc20.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: Brc20ByAddressResponse, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* repeated ordinals.OutPoint outpoints = 1; */
+        for (let i = 0; i < message.outpoints.length; i++)
+            OutPoint.internalBinaryWrite(message.outpoints[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* repeated ordinals.Brc20 brc20s = 2 [json_name = "brc20s"]; */
+        for (let i = 0; i < message.brc20S.length; i++)
+            Brc20.internalBinaryWrite(message.brc20S[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message ordinals.Brc20ByAddressResponse
+ */
+export const Brc20ByAddressResponse = new Brc20ByAddressResponse$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class Brc20$Type extends MessageType<Brc20> {
+    constructor() {
+        super("ordinals.Brc20", [
+            { no: 1, name: "tick", kind: "scalar", T: 12 /*ScalarType.BYTES*/ },
+            { no: 2, name: "balance", kind: "scalar", T: 4 /*ScalarType.UINT64*/, L: 0 /*LongType.BIGINT*/ }
+        ]);
+    }
+    create(value?: PartialMessage<Brc20>): Brc20 {
+        const message = globalThis.Object.create((this.messagePrototype!));
+        message.tick = new Uint8Array(0);
+        message.balance = 0n;
+        if (value !== undefined)
+            reflectionMergePartial<Brc20>(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Brc20): Brc20 {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bytes tick */ 1:
+                    message.tick = reader.bytes();
+                    break;
+                case /* uint64 balance */ 2:
+                    message.balance = reader.uint64().toBigInt();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message: Brc20, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter {
+        /* bytes tick = 1; */
+        if (message.tick.length)
+            writer.tag(1, WireType.LengthDelimited).bytes(message.tick);
+        /* uint64 balance = 2; */
+        if (message.balance !== 0n)
+            writer.tag(2, WireType.Varint).uint64(message.balance);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message ordinals.Brc20
+ */
+export const Brc20 = new Brc20$Type();

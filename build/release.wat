@@ -266,22 +266,24 @@
  (data $103.1 (i32.const 9944) "\02\00\00\00\0c\00\00\00/\00t\00o\00t\00a\00l")
  (data $104 (i32.const 9964) ",")
  (data $104.1 (i32.const 9976) "\02\00\00\00\10\00\00\00/\00h\00o\00l\00d\00e\00r\00s")
- (data $105 (i32.const 10012) ",\00\00\00\03\00\00\00\00\00\00\007\00\00\00\14\00\00\00\00 \00\00\00\00\00\00P \00\00\00\00\00\00\80 ")
- (data $106 (i32.const 10060) ",")
- (data $106.1 (i32.const 10072) "\02\00\00\00\12\00\00\00/\00b\00a\00l\00a\00n\00c\00e\00s")
- (data $107 (i32.const 10108) "\1c")
- (data $107.1 (i32.const 10120) "A\00\00\00\08\00\00\00\06")
- (data $108 (i32.const 10140) "<")
- (data $108.1 (i32.const 10152) "\02\00\00\00 \00\00\00~\00l\00i\00b\00/\00d\00a\00t\00a\00v\00i\00e\00w\00.\00t\00s")
- (data $109 (i32.const 10204) "<")
- (data $109.1 (i32.const 10216) "\02\00\00\00\"\00\00\00D\00e\00c\00o\00d\00e\00r\00 \00p\00o\00s\00i\00t\00i\00o\00n\00 ")
- (data $110 (i32.const 10268) "<")
- (data $110.1 (i32.const 10280) "\02\00\00\00\"\00\00\00 \00i\00s\00 \00o\00u\00t\00 \00o\00f\00 \00r\00a\00n\00g\00e\00!")
- (data $111 (i32.const 10332) "\1c\00\00\00\03\00\00\00\00\00\00\007\00\00\00\0c\00\00\00\f0\'\00\00\00\00\00\000(")
- (data $112 (i32.const 10364) "<")
- (data $112.1 (i32.const 10376) "\02\00\00\00(\00\00\00a\00s\00s\00e\00m\00b\00l\00y\00/\00p\00r\00o\00t\00o\00b\00u\00f\00.\00t\00s")
- (data $113 (i32.const 10428) "\1c")
- (data $113.1 (i32.const 10440) "M\00\00\00\08\00\00\00\07")
+ (data $105 (i32.const 10012) ",")
+ (data $105.1 (i32.const 10024) "\02\00\00\00\12\00\00\00/\00t\00i\00c\00k\00e\00r\00s\00/")
+ (data $106 (i32.const 10060) ",\00\00\00\03\00\00\00\00\00\00\007\00\00\00\14\00\00\00\00 \00\00\00\00\00\00P \00\00\00\00\00\00\80 ")
+ (data $107 (i32.const 10108) ",")
+ (data $107.1 (i32.const 10120) "\02\00\00\00\12\00\00\00/\00b\00a\00l\00a\00n\00c\00e\00s")
+ (data $108 (i32.const 10156) "\1c")
+ (data $108.1 (i32.const 10168) "A\00\00\00\08\00\00\00\06")
+ (data $109 (i32.const 10188) "<")
+ (data $109.1 (i32.const 10200) "\02\00\00\00 \00\00\00~\00l\00i\00b\00/\00d\00a\00t\00a\00v\00i\00e\00w\00.\00t\00s")
+ (data $110 (i32.const 10252) "<")
+ (data $110.1 (i32.const 10264) "\02\00\00\00\"\00\00\00D\00e\00c\00o\00d\00e\00r\00 \00p\00o\00s\00i\00t\00i\00o\00n\00 ")
+ (data $111 (i32.const 10316) "<")
+ (data $111.1 (i32.const 10328) "\02\00\00\00\"\00\00\00 \00i\00s\00 \00o\00u\00t\00 \00o\00f\00 \00r\00a\00n\00g\00e\00!")
+ (data $112 (i32.const 10380) "\1c\00\00\00\03\00\00\00\00\00\00\007\00\00\00\0c\00\00\00 (\00\00\00\00\00\00`(")
+ (data $113 (i32.const 10412) "<")
+ (data $113.1 (i32.const 10424) "\02\00\00\00(\00\00\00a\00s\00s\00e\00m\00b\00l\00y\00/\00p\00r\00o\00t\00o\00b\00u\00f\00.\00t\00s")
+ (data $114 (i32.const 10476) "\1c")
+ (data $114.1 (i32.const 10488) "M\00\00\00\08\00\00\00\07")
  (table $0 8 8 funcref)
  (elem $0 (i32.const 1) $~lib/metashrew-as/assembly/utils/utils/concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|0 $~lib/metashrew-as/assembly/utils/box/Box.concat~anonymous|1 $assembly/index/SatRanges.fromTransaction~anonymous|0 $assembly/index/SatRanges#pull~anonymous|0 $~lib/metashrew-as/assembly/indexer/index/_flush~anonymous|0 $assembly/index/outpointToSatRanges~anonymous|0)
  (export "trap" (func $assembly/index/trap))
@@ -1084,7 +1086,7 @@
  (func $start:assembly/index
   (local $0 i32)
   (local $1 i32)
-  i32.const 10460
+  i32.const 10508
   global.set $~lib/rt/stub/offset
   i32.const 0
   i32.const 5
@@ -10998,14 +11000,14 @@
         i32.sub
         i32.load offset=16
         if
-         i32.const 10036
+         i32.const 10084
          local.get $6
          call $~lib/string/String.UTF8.decode
          i32.store
-         i32.const 10044
+         i32.const 10092
          i32.const 8496
          i32.store
-         i32.const 10032
+         i32.const 10080
          call $~lib/staticarray/StaticArray<~lib/string/String>#join
          i32.const 8560
          i32.const 106
@@ -11740,7 +11742,7 @@
     local.get $0
     local.get $7
     local.get $4
-    i32.const 10128
+    i32.const 10176
     i32.load
     call_indirect (type $8)
     local.set $1
@@ -12082,7 +12084,7 @@
   i32.or
   if
    i32.const 2608
-   i32.const 10160
+   i32.const 10208
    i32.const 25
    i32.const 7
    call $~lib/builtins/abort
@@ -12183,7 +12185,7 @@
   i32.ge_u
   if
    i32.const 3344
-   i32.const 10160
+   i32.const 10208
    i32.const 72
    i32.const 50
    call $~lib/builtins/abort
@@ -12514,7 +12516,7 @@
    i32.load offset=8
    i32.gt_s
    if
-    i32.const 10356
+    i32.const 10404
     local.get $0
     i32.load offset=4
     local.tee $0
@@ -12600,9 +12602,9 @@
      i32.const 6352
     end
     i32.store
-    i32.const 10352
+    i32.const 10400
     call $~lib/staticarray/StaticArray<~lib/string/String>#join
-    i32.const 10384
+    i32.const 10432
     i32.const 278
     i32.const 7
     call $~lib/builtins/abort
@@ -13777,7 +13779,7 @@
     local.get $3
     local.get $1
     local.get $5
-    i32.const 10448
+    i32.const 10496
     i32.load
     call_indirect (type $14)
     i64.store

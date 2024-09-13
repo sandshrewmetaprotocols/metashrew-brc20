@@ -1,51 +1,70 @@
-import { u128 } from "as-bignum";
 import { BRC20_INDEX } from "../brc20";
 import { input } from "metashrew-as/assembly/indexer";
-import { brc20 as protobuf } from "../../proto/brc20";
+import { ordinals } from "../protobuf";
+import { Brc20ByAddressResponse } from "../../src.ts/ordinals";
 
 export function brc20byaddress(): ArrayBuffer {
-  const _address = protobuf.WalletRequest.decode(input().slice(4)).wallet;
+  const _address = ordinals.Brc20ByAddressRequest.decode(
+    input().slice(4)
+  ).address;
   const address = changetype<Uint8Array>(_address).buffer;
+  const balances = BRC20_INDEX.keyword("/balances/").select(address).getList();
+  const brc20Tickers = BRC20_INDEX.keyword("/tickers/")
+    .select(address)
+    .getList();
+  const outpointsByAddress = BRC20_INDEX.keyword("/outpoints/")
+    .select(address)
+    .getList();
+  const brc20s = new Array<ordinals.Brc20>();
+  const outpoints = new Array<ordinals.OutPoint>();
+  const message = new ordinals.Brc20ByAddressResponse();
 
-  const brc20s = new Array(
-    BRC20_INDEX.keyword("/tickers/").select(address).get()
-  );
-  const balances = new Array(
-    BRC20_INDEX.keyword("/balances/").select(address).get()
-  );
-
-  const balanceSheets = new Map<ArrayBuffer, u128>();
-  for (let i = 0; i < brc20s.length; i++) {
-    balanceSheets.set(brc20s[i], u128.from(balances[i]));
+  for (let i = 0; i < brc20Tickers.length; i++) {
+    brc20s.push({
+      tick: brc20Tickers[i],
+      balance: balances[i],
+    });
   }
 
-  return mapToArrayBuffer(balanceSheets);
+  for (let i = 0; i < outpointsByAddress.length; i++) {
+    outpoints.push({
+      hash: outpointsByAddress[i],
+      vout: outpointsByAddress[i],
+    });
+  }
+  message.brc20s = brc20s;
+  message.outpoints = outpoints;
+
+  return message.encode();
 }
 
-function mapToArrayBuffer(map: Map<ArrayBuffer, u128>): ArrayBuffer {
-  // Step 1: Calculate total size required for the ArrayBuffer
-  let totalSize: usize = 0;
-
-  // Each key is an ArrayBuffer and each value is a u128 (16 bytes)
-  for (let [key, value] of map) {
-    totalSize += key.byteLength; // size of ArrayBuffer (key)
-    totalSize += 16; // size of u128 (value)
+export function decodeBrc20ByAddressResponse(hex: string): {
+  outpoints: Array<{
+    hash: string;
+    vout: u32;
+  }>;
+  brc20s: Array<{
+    tick: string;
+    balance: u64;
+  }>;
+} {
+  if (!hex || hex === "0x") {
+    return { brc20s: [], outpoints: [] };
   }
-
-  // Step 2: Allocate a new ArrayBuffer of the required size
-  let buffer = new ArrayBuffer(totalSize);
-  let pointer = changetype<usize>(buffer); // Pointer to start of the buffer
-
-  // Step 3: Serialize each key (ArrayBuffer) and value (u128)
-  for (let [key, value] of map) {
-    // Copy the key (ArrayBuffer) into the buffer
-    memory.copy(pointer, changetype<usize>(key), key.byteLength);
-    pointer += key.byteLength;
-
-    // Store the value (u128) in the buffer
-    store<u128>(pointer, value);
-    pointer += 16; // Advance pointer by size of u128
+  const buffer = Buffer.from(stripHexPrefix(hex), "hex");
+  if (buffer.length === 0) {
+    return { brc20s: [], outpoints: [] };
   }
+  const response = Brc20ByAddressResponse.fromBinary(buffer);
 
-  return buffer;
+  return {
+    brc20s: response.brc20S.map((brc20) => ({
+      tick: Buffer.from(brc20.tick).toString("utf8"),
+      balance: brc20.balance,
+    })),
+    outpoints: response.outpoints.map((outpoint) => ({
+      hash: Buffer.from(outpoint.hash).toString("utf8"),
+      vout: outpoint.vout,
+    })),
+  };
 }
