@@ -1,70 +1,50 @@
-import { BRC20_INDEX } from "../brc20";
+import { Box } from "metashrew-as/assembly/utils/box";
+import { parsePrimitive } from "metashrew-as/assembly/utils/utils";
 import { input } from "metashrew-as/assembly/indexer";
-import { ordinals } from "../protobuf";
-import { Brc20ByAddressResponse } from "../../src.ts/ordinals";
+import { arrayToArrayBuffer } from "metashrew-as/assembly/blockdata/address";
+import { arrayBufferToArray } from "metashrew-as/assembly/indexer";
+import { u128FromArrayBuffer, BRC20_INDEX } from "../brc20";
+import { ordinals as protobuf } from "../protobuf";
+import { OUTPOINTS_FOR_ADDRESS } from "metashrew-spendables/assembly/tables";
+import { OutPoint } from "metashrew-as/assembly/blockdata/transaction";
 
 export function brc20byaddress(): ArrayBuffer {
-  const _address = ordinals.Brc20ByAddressRequest.decode(
+  const data = Box.from(input());
+  parsePrimitive<u32>(data);
+  const address = arrayToArrayBuffer(protobuf.Brc20ByAddressRequest.decode(
     input().slice(4)
-  ).address;
-  const address = changetype<Uint8Array>(_address).buffer;
-  const balances = BRC20_INDEX.keyword("/balances/").select(address).getList();
-  const brc20Tickers = BRC20_INDEX.keyword("/tickers/")
+  ).address);
+  const tickers = BRC20_INDEX.keyword("tickers/")
     .select(address)
     .getList();
-  const outpointsByAddress = BRC20_INDEX.keyword("/outpoints/")
-    .select(address)
-    .getList();
-  const brc20s = new Array<ordinals.Brc20>();
-  const outpoints = new Array<ordinals.OutPoint>();
-  const message = new ordinals.Brc20ByAddressResponse();
+  const balances: Array<ArrayBuffer> = new Array<ArrayBuffer>();
+  for (let i = 0; i < tickers.length; i++) {
+    balances.push(BRC20_INDEX.select(tickers[i]).keyword("/balances/").select(address).get());
+  }
+  const outpointsByAddress = OUTPOINTS_FOR_ADDRESS.select(address).getList().map((v: ArrayBuffer, i: i32, ary: Array<ArrayBuffer>) => new OutPoint(Box.from(v)));
+  const sequenceNumbers = outpointsByAddress.map((v: OutPoint, i: i32, ary: Array<OutPoint>) => BRC20_INDEX.keyword("/sequence/byoutpoint/").select(v.toArrayBuffer()).getValue<u64>());
+  const brc20s = new Array<protobuf.Brc20>();
+  const outpoints = new Array<protobuf.OutPoint>();
+  const message = new protobuf.Brc20ByAddressResponse();
 
-  for (let i = 0; i < brc20Tickers.length; i++) {
+  for (let i = 0; i < tickers.length; i++) {
     brc20s.push({
-      tick: brc20Tickers[i],
-      balance: balances[i],
+      tick: arrayBufferToArray(tickers[i]),
+      balance: u128FromArrayBuffer(balances[i]).toU64(),
     });
   }
 
   for (let i = 0; i < outpointsByAddress.length; i++) {
-    outpoints.push({
-      hash: outpointsByAddress[i],
-      vout: outpointsByAddress[i],
-    });
+    if (sequenceNumbers[i] !== 0) {
+      outpoints.push({
+        hash: arrayBufferToArray(outpointsByAddress[i].txid.toArrayBuffer()),
+	sequence: sequenceNumbers[i],
+        vout: outpointsByAddress[i].index,
+      });
+    }
   }
   message.brc20s = brc20s;
   message.outpoints = outpoints;
 
   return message.encode();
-}
-
-export function decodeBrc20ByAddressResponse(hex: string): {
-  outpoints: Array<{
-    hash: string;
-    vout: u32;
-  }>;
-  brc20s: Array<{
-    tick: string;
-    balance: u64;
-  }>;
-} {
-  if (!hex || hex === "0x") {
-    return { brc20s: [], outpoints: [] };
-  }
-  const buffer = Buffer.from(stripHexPrefix(hex), "hex");
-  if (buffer.length === 0) {
-    return { brc20s: [], outpoints: [] };
-  }
-  const response = Brc20ByAddressResponse.fromBinary(buffer);
-
-  return {
-    brc20s: response.brc20S.map((brc20) => ({
-      tick: Buffer.from(brc20.tick).toString("utf8"),
-      balance: brc20.balance,
-    })),
-    outpoints: response.outpoints.map((outpoint) => ({
-      hash: Buffer.from(outpoint.hash).toString("utf8"),
-      vout: outpoint.vout,
-    })),
-  };
 }

@@ -674,6 +674,7 @@ export namespace ordinals {
   export class OutPoint {
     public hash: Array<u8> = new Array<u8>();
     public vout: u32;
+    public sequence: u64;
 
     // Decodes OutPoint from an ArrayBuffer
     static decode(buf: ArrayBuffer): OutPoint {
@@ -698,6 +699,10 @@ export namespace ordinals {
             obj.vout = decoder.uint32();
             break;
           }
+          case 3: {
+            obj.sequence = decoder.uint64();
+            break;
+          }
 
           default:
             decoder.skipType(tag & 7);
@@ -716,6 +721,7 @@ export namespace ordinals {
           ? 1 + __proto.Sizer.varint64(this.hash.length) + this.hash.length
           : 0;
       size += this.vout == 0 ? 0 : 1 + __proto.Sizer.uint32(this.vout);
+      size += this.sequence == 0 ? 0 : 1 + __proto.Sizer.uint64(this.sequence);
 
       return size;
     }
@@ -741,6 +747,10 @@ export namespace ordinals {
       if (this.vout != 0) {
         encoder.uint32(0x10);
         encoder.uint32(this.vout);
+      }
+      if (this.sequence != 0) {
+        encoder.uint32(0x18);
+        encoder.uint64(this.sequence);
       }
 
       return buf;

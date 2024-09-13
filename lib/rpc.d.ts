@@ -1,3 +1,13 @@
+export declare function decodeBrc20ByAddressResponse(hex: string): {
+    outpoints: Array<{
+        hash: string;
+        vout: number;
+    }>;
+    brc20s: Array<{
+        tick: string;
+        balance: bigint;
+    }>;
+};
 export declare class MetashrewOrd {
     baseUrl: string;
     blockTag: string;

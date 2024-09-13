@@ -5,6 +5,7 @@ package ordinals;
 message OutPoint {
   bytes hash = 1;
   uint32 vout = 2;
+  uint64 sequence = 3;
 }
 
 message SatRange {

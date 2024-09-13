@@ -283,7 +283,7 @@ class Index {
 	OUTPOINT_TO_SEQUENCE_NUMBERS.select(outpoint).appendValue<u64>(sequenceNumber);
 	const body = inscription.body();
 	if (body !== null) {
-          processInscriptionForBRC20(sequenceNumber, tx.outs[outputIndex].script, body);
+          processInscriptionForBRC20(outpoint, sequenceNumber, tx.outs[outputIndex].script, body);
 	}
       } else {
         const previousOutput = tx.ins[i].previousOutput().toArrayBuffer();
@@ -488,3 +488,5 @@ export function test_nullTx(): void {
   const buffer = new Transaction(Box.from(new ArrayBuffer(0)));
   console.log(Box.from(buffer.txid()).toHexString());
 }
+
+export * from "./view";
